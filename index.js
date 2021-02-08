@@ -2,21 +2,19 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const dotenv = require("dotenv");
-//models
-const TodoTask = require("./models/TodoTask");
 
 const favicon = require('serve-favicon')
 const path = require('path')
 
-app.use(favicon(path.join(__dirname, 'public/images', 'bg.ico')))
+//models
+const todotask = require("./models/todotask");
 
 dotenv.config();
 
+app.use(favicon(path.join(__dirname, 'public/images', 'bg.ico')))
 app.use("/static", express.static("public"));
-
 //view engine configuration
 app.set("view engine", "ejs");
-
 // Urlencoded will allow us to extract the data from the form by adding her to the body property of the request.
 app.use(express.urlencoded({ extended: true }));
 
@@ -24,22 +22,14 @@ app.use(express.urlencoded({ extended: true }));
 mongoose.set("useFindAndModify", false);
 
 mongoose.connect(process.env.DB_CONNECT, { useNewUrlParser:true, useUnifiedTopology: true }, () => {
-    console.log("Connected to db!");
+    //console.log("Connected to db!");
+    console.log(mongoose.connection.readyState)
     app.listen(3000, () => console.log("Server is running and  listening to port:3000!"));
 })
 
-// Get Method
-/* app.get("/", (req, res) => {
-    //res.send("Hello World!")
-    res.render("todo");
-}); */
-
-//models
-//const TodoTask = require("./models/todotask");
-
 // Post Method - insert data
 app.post("/", async (req, res) => {
-    const todoTask1 = new TodoTask({
+    const todoTask1 = new todotask({
         content: req.body.content
     });
     //console.log(req.body);
@@ -59,8 +49,8 @@ app.post("/", async (req, res) => {
 /** Get method - read data
     TodoTask get from model **/
 app.get("/", (req, res) => {
-    TodoTask.find( {}, (err, tasks) => {
-        res.render("todo.ejs", { TodoTask: tasks });
+    todotask.find( {}, (err, tasks) => {
+        res.render("todo", { TodoTask: tasks });
     });
 });
 
